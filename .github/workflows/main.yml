@@ -1,50 +1,45 @@
 name: CI
 
-on:
-  push:
-  workflow_dispatch:
+
+on: [push, workflow_dispatch]
+
 
 jobs:
+
   build:
+
+
     runs-on: windows-latest
-    strategy:
-      matrix:
-        runsAs: ['NT AUTHORITY\SYSTEM']
+
 
     steps:
+
     - name: Download
+
       run: Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
 
     - name: Extract
+
       run: Expand-Archive ngrok.zip
 
     - name: Auth
+
       run: .\ngrok\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
+
       env:
+
         NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
 
     - name: Enable TS
-      run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -name "fDenyTSConnections" -Value 0
 
-    - name: Enable Remote Desktop Firewall Rule
-      run: Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
-      
+      run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
+
+    - run: Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
 
     - run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
 
-    - run: Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "P@ssw0rd!" -Force)
+    - run: Set-LocalUser -Name "ali" -Password (ConvertTo-SecureString -AsPlainText "hussain" -Force)
 
-    - name: Check and Create Tunnel
-      run: |
-        if (-not (Test-NetConnection -ComputerName "localhost" -Port 3389 -InformationLevel Quiet)) {
-          $ngrokOutput = .\ngrok\ngrok.exe tcp 3389
-          Write-Host "Ngrok tunnel details:"
-          Write-Host $ngrokOutput
-        } else {
-          Write-Host "RDP tunnel already exists."
-        }
+    - name: Create Tunnel
 
-        # Keep the workflow running indefinitely
-        while ('true') {
-          Start-Sleep -Seconds 60
-        }
+      run: .\ngrok\ngrok.exe tcp 3389
