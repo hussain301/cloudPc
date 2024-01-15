@@ -28,7 +28,7 @@ jobs:
 
     - name: Enable Remote Desktop Firewall Rule
       run: Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
-      continue-on-error: 'true'
+      continue-on-error: true
 
     - run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
 
