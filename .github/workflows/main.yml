@@ -11,10 +11,9 @@ jobs:
         Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
         Expand-Archive ngrok.zip -DestinationPath ngrok_temp
         Move-Item -Path ngrok_temp\ngrok.exe -Destination .
-    - name: Make ngrok executable
+    - name: Update ngrok agent
       run: |
-        Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
-        Get-ChildItem .\ngrok.exe | ForEach-Object { $_.IsReadOnly = $false }
+        .\ngrok.exe update
     - name: Auth
       run: .\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
       env:
